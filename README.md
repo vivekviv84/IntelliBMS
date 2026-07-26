@@ -277,15 +277,15 @@ The interactive Streamlit dashboard (`dashboard/app.py`) provides full simulatio
 
 ## 📈 Evaluation & Results
 
-Results evaluated over a 7-day simulation period in Chicago (TMY3 weather data):
+Results evaluated over a 7-day EnergyPlus simulation period in Bengaluru, India (`IND_KA_Bengaluru.432950_ISHRAE2014.epw`):
 
 | Metric | Baseline Controller | EcoLoop AI Agent | Delta / Savings |
 |--------|--------------------|------------------|-----------------|
-| **Total Energy Consumption** | **218.96 kWh** | **206.27 kWh** | **+5.79% Energy Savings** 🟢 |
-| **Peak Demand** | **4114.33 W** | **4155.48 W** | **-1.00% Peak Demand** 🟠 |
-| **Average Comfort Deviation** | **0.227 °C** | **0.422 °C** | **+0.195 °C (within band)** 🔵 |
-| **Carbon Emissions (7-day)** | **51.02 kg CO₂** | **48.06 kg CO₂** | **~2.95 kg CO₂ Saved** 🟢 |
-| **Electricity Cost ($0.12/kWh)** | **$26.28** | **$24.75** | **~$1.52 Saved (7-day period)** 🟢 |
+| **Total Energy Consumption** | **230.56 kWh** | **218.37 kWh** | **+5.29% Energy Savings** 🟢 |
+| **Peak Demand** | **4,239.78 W** | **3,952.23 W** | **+6.78% Peak Load Reduction** 🟢 |
+| **Average Comfort Deviation** | **0.471 °C** | **0.194 °C** | **+58.8% Comfort Improvement** 🟢 |
+| **Carbon Footprint (7-day)** | **53.72 kg CO₂** | **50.88 kg CO₂** | **2.84 kg CO₂ Emissions Avoided** 🟢 |
+| **Electricity Cost (BESCOM ₹9.50/kWh)** | **₹2,190.32** | **₹2,074.52** | **₹115.80 Saved in 7 days (₹6,038/yr)** 🟢 |
 
 ---
 
@@ -336,6 +336,10 @@ streamlit run dashboard/app.py
 Configure runtime settings using environment variables:
 
 ```bash
+# EnergyPlus Installation Directory (Optional - Auto-Discovered if omitted)
+export ENERGYPLUS_DIR="/path/to/EnergyPlus"      # e.g., C:\EnergyPlusV26-1-0 or /usr/local/EnergyPlus-26-1-0
+export ENERGYPLUS_EXE="/path/to/energyplus.exe"  # Direct executable path fallback
+
 # Ollama Endpoints
 export OLLAMA_URL="http://localhost:11434/api/generate"
 export OLLAMA_CHAT_URL="http://localhost:11434/api/chat"

@@ -360,6 +360,18 @@ def _build_user_prompt(obs: ObservationContext, confidence: ConfidenceBreakdown)
     if comfort_note:
         blocks.append(f"=== COMFORT OPTIMIZER ===\n{comfort_note}")
 
+    economizer_note = getattr(obs, "_economizer_note", "")
+    if economizer_note:
+        blocks.append(f"=== ECONOMIZER ANALYSIS ===\n{economizer_note}")
+
+    dr_note = getattr(obs, "_dr_note", "")
+    if dr_note:
+        blocks.append(f"=== DEMAND RESPONSE / PEAK TARIFF ANALYSIS ===\n{dr_note}")
+
+    precool_note = getattr(obs, "_precool_note", "")
+    if precool_note:
+        blocks.append(f"=== PREDICTIVE PRE-COOLING ANALYSIS ===\n{precool_note}")
+
     blocks.append(confidence.to_prompt_block())
     blocks.append(
         "Now evaluate ALL FOUR candidate actions (off, eco, normal, boost) and return the required JSON."

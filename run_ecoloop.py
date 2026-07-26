@@ -5,10 +5,60 @@ import shutil
 import subprocess
 import sys
 
+def find_energyplus_executable() -> str:
+    """
+    Dynamically locate EnergyPlus binary across environment variables (ENERGYPLUS_DIR, ENERGYPLUS_HOME, ENERGYPLUS_EXE),
+    system PATH, and standard platform installation roots (Windows, Linux, macOS).
+    """
+    env_exe = os.environ.get("ENERGYPLUS_EXE")
+    if env_exe and os.path.exists(env_exe):
+        return env_exe
+
+    env_dir = os.environ.get("ENERGYPLUS_DIR") or os.environ.get("ENERGYPLUS_HOME")
+    if env_dir and os.path.exists(env_dir):
+        exe_name = "energyplus.exe" if sys.platform.startswith("win") else "energyplus"
+        candidate = os.path.join(env_dir, exe_name)
+        if os.path.exists(candidate):
+            return candidate
+
+    which_bin = shutil.which("energyplus") or shutil.which("energyplus.exe")
+    if which_bin and os.path.exists(which_bin):
+        return which_bin
+
+    candidate_roots = []
+    if sys.platform.startswith("win"):
+        candidate_roots.extend([r"C:\\", r"C:\Program Files", r"C:\Program Files (x86)"])
+    elif sys.platform.startswith("darwin"):
+        candidate_roots.extend(["/Applications", "/usr/local", "/opt"])
+    else:
+        candidate_roots.extend(["/usr/local/bin", "/usr/bin", "/opt"])
+
+    exe_name = "energyplus.exe" if sys.platform.startswith("win") else "energyplus"
+    for root in candidate_roots:
+        if not os.path.exists(root):
+            continue
+        try:
+            direct_exe = os.path.join(root, exe_name)
+            if os.path.exists(direct_exe):
+                return direct_exe
+
+            for entry in os.listdir(root):
+                if entry.lower().startswith("energyplus"):
+                    full_p = os.path.join(root, entry)
+                    if os.path.isdir(full_p):
+                        candidate = os.path.join(full_p, exe_name)
+                        if os.path.exists(candidate):
+                            return candidate
+        except Exception:
+            pass
+
+    return r"C:\EnergyPlusV26-1-0\energyplus.exe" if sys.platform.startswith("win") else "/usr/local/bin/energyplus"
+
+
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-ENERGYPLUS_DIR = r"C:\EnergyPlusV26-1-0"
+ENERGYPLUS_EXE = find_energyplus_executable()
 IDF_PATH = os.path.join(PROJECT_ROOT, "models", "ecoloop_model.idf")
-EPW_PATH = os.path.join(PROJECT_ROOT, "weather", "USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")
+EPW_PATH = os.path.join(PROJECT_ROOT, "weather", "IND_KA_Bengaluru.432950_ISHRAE2014.epw")
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, "logs", "ecoloop_out")
 SUMMARY_JSON = os.path.join(PROJECT_ROOT, "logs", "ecoloop_summary.json")
 PLUGINS_DIR = os.path.join(PROJECT_ROOT, "plugins")
@@ -69,6 +119,8 @@ def parse_facility_energy(output_dir: str) -> float:
 
 def run_ecoloop_simulation():
     print("=== Running EnergyPlus EcoLoop AI Simulation ===")
+    print(f"[INFO] Weather File: {os.path.basename(EPW_PATH)}")
+    print("[NOTE] SizingPeriod:DesignDay objects remain set to baseline design conditions (known simplification for equipment auto-sizing; hourly simulation uses full Bengaluru EPW data).")
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     os.makedirs(os.path.dirname(SUMMARY_JSON), exist_ok=True)
 
@@ -89,7 +141,16 @@ def run_ecoloop_simulation():
             "action", "coil_speed", "confidence", "reasoning", "energy_kwh",
             "comfort_deviation", "outcome", "success", "violations", "via_mcp",
             "risk_level", "expected_savings_pct", "rejection_reasoning", "candidates",
-            "conf_historical", "conf_sensor", "conf_weather", "conf_comfort", "conf_stability"
+            "conf_historical", "conf_sensor", "conf_weather", "conf_comfort", "conf_stability",
+            "economizer_recommended", "economizer_mode", "temperature_advantage",
+            "estimated_runtime_saved_hours", "estimated_energy_saved_kwh", "planner_accepted",
+            "validator_overrode", "final_free_cooling_used", "economizer_confidence",
+            "is_peak_window", "tariff_period", "tariff_inr_kwh",
+            "dr_recommended", "dr_planner_accepted",
+            "dr_validator_overrode", "dr_final_used", "dr_cost_saved_inr",
+            "precool_recommended", "predicted_peak_outdoor_temp",
+            "precool_planner_accepted", "precool_validator_overrode",
+            "precool_final_used",
         ])
 
     trace_log_p = os.path.join(log_dir, "runtime_trace.csv")
@@ -114,9 +175,8 @@ def run_ecoloop_simulation():
                 if fname.endswith(".py"):
                     shutil.copy2(os.path.join(src_dir, fname), os.path.join(MODELS_DIR, fname))
 
-    energyplus_exe = os.path.join(ENERGYPLUS_DIR, "energyplus.exe")
     cmd = [
-        energyplus_exe,
+        ENERGYPLUS_EXE,
         "-d", OUTPUT_DIR,
         "-w", EPW_PATH,
         IDF_PATH

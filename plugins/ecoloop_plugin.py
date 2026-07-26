@@ -365,7 +365,18 @@ class CoilSpeedControl(EnergyPlusPlugin):
                         "timestamp", "zone_temp", "heating_sp", "cooling_sp",
                         "outdoor_temp", "action", "coil_speed", "confidence",
                         "reasoning", "energy_kwh", "comfort_deviation",
-                        "outcome", "success", "violations", "via_mcp"
+                        "outcome", "success", "violations", "via_mcp",
+                        "risk_level", "expected_savings_pct", "rejection_reasoning", "candidates",
+                        "conf_historical", "conf_sensor", "conf_weather", "conf_comfort", "conf_stability",
+                        "economizer_recommended", "economizer_mode", "temperature_advantage",
+                        "estimated_runtime_saved_hours", "estimated_energy_saved_kwh", "planner_accepted",
+                        "validator_overrode", "final_free_cooling_used", "economizer_confidence",
+                        "is_peak_window", "tariff_period", "tariff_inr_kwh",
+                        "dr_recommended", "dr_planner_accepted",
+                        "dr_validator_overrode", "dr_final_used", "dr_cost_saved_inr",
+                        "precool_recommended", "predicted_peak_outdoor_temp",
+                        "precool_planner_accepted", "precool_validator_overrode",
+                        "precool_final_used",
                     ])
                 dev = max(max(0.0, zt - csp), max(0.0, hsp - zt))
                 w.writerow([
@@ -374,6 +385,11 @@ class CoilSpeedControl(EnergyPlusPlugin):
                     "0.400", result["rationale"],
                     "0.000000", f"{dev:.3f}",
                     "FALLBACK", False, "", False,
+                    "high", "0.0", "", "[]",
+                    "0.40", "0.40", "0.40", "0.40", "0.40",
+                    False, "NO_ACTION", "0.00", "0.00", "0.000", False, False, False, "0.40",
+                    False, "NORMAL", "10.00", False, False, False, False, "0.00",
+                    False, "0.00", False, False, False,
                 ])
         except Exception:
             pass

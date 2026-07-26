@@ -1,9 +1,9 @@
 {
   "simulation": "ecoloop_ai",
-  "total_facility_electricity_kwh": 1030.8,
+  "total_facility_electricity_kwh": 218.37,
   "idf_path": "C:\\Users\\ACER\\Desktop\\honeywell\\Eco loop\\ecoloop\\models\\ecoloop_model.idf",
-  "epw_path": "C:\\Users\\ACER\\Desktop\\honeywell\\Eco loop\\ecoloop\\weather\\USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw",
+  "epw_path": "C:\\Users\\ACER\\Desktop\\honeywell\\Eco loop\\ecoloop\\weather\\IND_KA_Bengaluru.432950_ISHRAE2014.epw",
   "return_code": 0,
-  "peak_demand_w": 4230.45,
-  "peak_demand_timestamp": "18-JUL-16:00"
+  "peak_demand_w": 3952.23,
+  "peak_demand_timestamp": "07-JUL-15:00"
 }

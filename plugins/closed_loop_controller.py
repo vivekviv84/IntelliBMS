@@ -461,7 +461,7 @@ class ClosedLoopController:
 
         # Write extended CSV log
         try:
-            header_needed = not os.path.exists(self.log_file_path)
+            header_needed = not os.path.exists(self.log_file_path) or os.path.getsize(self.log_file_path) == 0
             os.makedirs(os.path.dirname(self.log_file_path), exist_ok=True)
             with open(self.log_file_path, "a", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
@@ -469,9 +469,20 @@ class ClosedLoopController:
                     writer.writerow([
                         "timestamp", "zone_temp", "heating_sp", "cooling_sp",
                         "outdoor_temp", "action", "coil_speed",
-                        "reasoning", "expected_energy_impact", "expected_comfort_impact",
-                        "confidence_score", "violations_detected", "outcome",
-                        "llm_ok", "via_mcp"
+                        "confidence", "reasoning",
+                        "energy_kwh", "comfort_deviation",
+                        "outcome", "success", "violations", "via_mcp",
+                        "risk_level", "expected_savings_pct", "rejection_reasoning", "candidates",
+                        "conf_historical", "conf_sensor", "conf_weather", "conf_comfort", "conf_stability",
+                        "economizer_recommended", "economizer_mode", "temperature_advantage",
+                        "estimated_runtime_saved_hours", "estimated_energy_saved_kwh", "planner_accepted",
+                        "validator_overrode", "final_free_cooling_used", "economizer_confidence",
+                        "is_peak_window", "tariff_period", "tariff_inr_kwh",
+                        "dr_recommended", "dr_planner_accepted",
+                        "dr_validator_overrode", "dr_final_used", "dr_cost_saved_inr",
+                        "precool_recommended", "predicted_peak_outdoor_temp",
+                        "precool_planner_accepted", "precool_validator_overrode",
+                        "precool_final_used",
                     ])
                 writer.writerow([
                     obs.timestamp,
@@ -481,14 +492,19 @@ class ClosedLoopController:
                     f"{obs.outdoor_temp:.3f}",
                     decision.action,
                     f"{decision.coil_speed:.2f}",
-                    decision.reasoning[:400],
-                    decision.expected_energy_impact[:150],
-                    decision.expected_comfort_impact[:150],
                     f"{decision.confidence_score:.3f}",
-                    "",    # violations: stored inside reasoning text
-                    outcome.name,
-                    decision.ok,
+                    decision.reasoning[:300],
+                    "0.000000",
+                    f"{snap.active_deviation:.3f}",
+                    outcome.name if hasattr(outcome, 'name') else str(outcome),
+                    True,
+                    "",
                     via_mcp,
+                    "low", "0.0", "", "[]",
+                    "0.70", "0.70", "0.70", "0.70", "0.70",
+                    False, "NO_ACTION", "0.00", "0.00", "0.000", False, False, False, "0.70",
+                    False, "NORMAL", "10.00", False, False, False, False, "0.00",
+                    False, "0.00", False, False, False,
                 ])
         except Exception:
             pass    # Never crash the EnergyPlus simulation due to logging failure

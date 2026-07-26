@@ -92,6 +92,15 @@ class DecisionExplanation:
     outcome:       str    # "SUCCESS" | "CORRECTED" | "FALLBACK"
     llm_ok:        bool
 
+    # Economizer 4-Stage Pipeline Analysis
+    economizer_recommended:        bool = False
+    economizer_mode:               str = "NO_ACTION"
+    economizer_temp_advantage:     float = 0.0
+    economizer_planner_accepted:   bool = False
+    economizer_validator_overrode: bool = False
+    economizer_final_used:         bool = False
+    economizer_reason:             str = ""
+
     # Formatted outputs (generated, not stored in __init__)
     human_readable:   str = field(default="", repr=False)
     structured_json:  str = field(default="", repr=False)
@@ -211,6 +220,13 @@ class ExplanationEngine:
             coil_speed    = result.clamped_speed,
             outcome       = outcome,
             llm_ok        = result.ok,
+            economizer_recommended        = (ctx.economizer_rec.economizer_active if ctx.economizer_rec else False),
+            economizer_mode               = (ctx.economizer_rec.recommended_mode if ctx.economizer_rec else "NO_ACTION"),
+            economizer_temp_advantage     = (ctx.economizer_rec.temperature_advantage if ctx.economizer_rec else 0.0),
+            economizer_planner_accepted   = (ctx.economizer_rec.economizer_active and result.action in ("off", "eco")) if ctx.economizer_rec else False,
+            economizer_validator_overrode = (ctx.validation.approved is False or ctx.validation.override_action is not None) if ctx.validation else False,
+            economizer_final_used         = (ctx.economizer_rec.economizer_active and result.action in ("off", "eco") and not (ctx.validation and (ctx.validation.approved is False or ctx.validation.override_action is not None))) if ctx.economizer_rec else False,
+            economizer_reason             = (ctx.economizer_rec.reason if ctx.economizer_rec else "N/A"),
         )
 
         exp.human_readable  = ExplanationEngine._format_human(exp)

@@ -54,6 +54,31 @@ class MemoryRecord:
     outcome:            str         # "SUCCESS" | "CORRECTED" | "ROLLED_BACK" | "FALLBACK"
     success:            bool        # True if no violations triggered
     violations:         List[str]   # List of ViolationType names that fired
+    # Economizer 4-Stage Pipeline & Telemetry Fields
+    economizer_recommended:        bool  = False
+    economizer_mode:               str   = "NO_ACTION"
+    temperature_advantage:        float = 0.0
+    estimated_runtime_saved_hours: float = 0.0
+    estimated_energy_saved_kwh:   float = 0.0
+    planner_accepted:              bool  = False
+    validator_overrode:            bool  = False
+    final_free_cooling_used:       bool  = False
+    economizer_confidence:         float = 0.0
+    # Demand Response 4-Stage Pipeline Fields
+    is_peak_window:                bool  = False
+    tariff_period:                 str   = "NORMAL"
+    tariff_inr_kwh:                float = 10.0
+    dr_recommended:                bool  = False
+    dr_planner_accepted:           bool  = False
+    dr_validator_overrode:         bool  = False
+    dr_final_used:                 bool  = False
+    dr_cost_saved_inr:             float = 0.0
+    # Predictive Pre-Cooling 4-Stage Pipeline Fields
+    precool_recommended:           bool  = False
+    predicted_peak_outdoor_temp:  float = 0.0
+    precool_planner_accepted:      bool  = False
+    precool_validator_overrode:    bool  = False
+    precool_final_used:            bool  = False
 
     def to_dict(self) -> dict:
         return asdict(self)

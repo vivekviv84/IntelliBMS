@@ -47,6 +47,9 @@ from reasoning_agent import (
     _safety_override,
 )
 from confidence_engine import ConfidenceEngine, ConfidenceBreakdown
+from economizer import EconomizerModule, EconomizerRecommendation
+from demand_response import DemandResponseModule, DemandResponseRecommendation
+from predictive_controller import PredictivePrecoolModule, PredictivePrecoolRecommendation
 from planning_agent import (
     PlannerDecision,
     get_planning_decision,
@@ -128,9 +131,12 @@ class AgentContext:
     """
     obs:              ObservationContext
     memory:           ShortTermMemory
-    energy_rec:       Optional[EnergyRecommendation]  = None
-    comfort_rec:      Optional[ComfortRecommendation] = None
-    llm_decision:     Optional[ReasoningDecision]     = None
+    energy_rec:       Optional[EnergyRecommendation]           = None
+    comfort_rec:      Optional[ComfortRecommendation]          = None
+    economizer_rec:   Optional[EconomizerRecommendation]       = None
+    dr_rec:           Optional[DemandResponseRecommendation]   = None
+    precool_rec:      Optional[PredictivePrecoolRecommendation] = None
+    llm_decision:     Optional[ReasoningDecision]              = None
     planner_decision: Optional[PlannerDecision]       = None
     confidence:       Optional[ConfidenceBreakdown]   = None
     validation:       Optional[ValidationResult]      = None
@@ -462,21 +468,80 @@ class LoggerAgent:
             (ld.confidence_score if ld else 0.0)
         )
 
+        # Economizer 4-Stage Pipeline Telemetry Extraction
+        e_rec = ctx.economizer_rec
+        econ_recommended = e_rec.economizer_active if e_rec else False
+        econ_mode        = e_rec.recommended_mode if e_rec else "NO_ACTION"
+        temp_adv         = e_rec.temperature_advantage if e_rec else 0.0
+        runtime_saved    = e_rec.estimated_runtime_saved_hours if e_rec else 0.0
+        energy_saved     = e_rec.estimated_energy_saved_kwh if e_rec else 0.0
+        econ_conf        = e_rec.confidence if e_rec else 0.0
+
+        planner_act      = pd.chosen_action if pd else "boost"
+        planner_accepted = econ_recommended and (planner_act in ("off", "eco"))
+
+        val              = ctx.validation
+        validator_ovr    = (val.approved is False or val.override_action is not None) if val else False
+
+        final_act        = result.action if result else "boost"
+        final_free_cool  = econ_recommended and (final_act in ("off", "eco")) and not validator_ovr
+
+        # Demand Response Telemetry
+        dr_rec           = ctx.dr_rec
+        is_pk_win        = dr_rec.is_peak_window if dr_rec else False
+        t_period         = dr_rec.current_tariff_period if dr_rec else "NORMAL"
+        t_inr            = dr_rec.current_tariff_inr_kwh if dr_rec else 10.0
+        dr_recommended   = dr_rec.dr_recommended if dr_rec else False
+        dr_accepted      = dr_recommended and (planner_act in ("off", "eco"))
+        dr_ovr           = validator_ovr if dr_recommended else False
+        dr_final         = dr_recommended and (final_act in ("off", "eco")) and not validator_ovr
+        dr_cost_saved    = dr_rec.estimated_cost_saved_inr if dr_rec else 0.0
+
+        # Predictive Pre-Cooling Telemetry
+        pc_rec           = ctx.precool_rec
+        pc_recommended   = pc_rec.precool_recommended if pc_rec else False
+        pc_peak_temp     = pc_rec.predicted_peak_outdoor_temp if pc_rec else 0.0
+        pc_accepted      = pc_recommended and (planner_act in ("eco", "normal", "boost"))
+        pc_ovr           = validator_ovr if pc_recommended else False
+        pc_final         = pc_recommended and (final_act in ("eco", "normal", "boost")) and not validator_ovr
+
         record = MemoryRecord(
-            timestamp         = obs.timestamp,
-            zone_temp         = obs.zone_temp,
-            heating_sp        = obs.heating_sp,
-            cooling_sp        = obs.cooling_sp,
-            outdoor_temp      = obs.outdoor_temp,
-            action            = result.action,
-            coil_speed        = result.clamped_speed,
-            reasoning         = reasoning_text,
-            confidence        = confidence_val,
-            energy_kwh        = energy_kwh,
-            comfort_deviation = active_dev,
-            outcome           = outcome,
-            success           = (len(violations) == 0),
-            violations        = violations,
+            timestamp                      = obs.timestamp,
+            zone_temp                      = obs.zone_temp,
+            heating_sp                     = obs.heating_sp,
+            cooling_sp                     = obs.cooling_sp,
+            outdoor_temp                   = obs.outdoor_temp,
+            action                         = result.action,
+            coil_speed                     = result.clamped_speed,
+            reasoning                      = reasoning_text,
+            confidence                     = confidence_val,
+            energy_kwh                     = energy_kwh,
+            comfort_deviation              = active_dev,
+            outcome                        = outcome,
+            success                        = (len(violations) == 0),
+            violations                     = violations,
+            economizer_recommended         = econ_recommended,
+            economizer_mode                = econ_mode,
+            temperature_advantage         = temp_adv,
+            estimated_runtime_saved_hours  = runtime_saved,
+            estimated_energy_saved_kwh    = energy_saved,
+            planner_accepted               = planner_accepted,
+            validator_overrode             = validator_ovr,
+            final_free_cooling_used        = final_free_cool,
+            economizer_confidence          = econ_conf,
+            is_peak_window                 = is_pk_win,
+            tariff_period                  = t_period,
+            tariff_inr_kwh                 = t_inr,
+            dr_recommended                 = dr_recommended,
+            dr_planner_accepted            = dr_accepted,
+            dr_validator_overrode          = dr_ovr,
+            dr_final_used                  = dr_final,
+            dr_cost_saved_inr              = dr_cost_saved,
+            precool_recommended            = pc_recommended,
+            predicted_peak_outdoor_temp   = pc_peak_temp,
+            precool_planner_accepted       = pc_accepted,
+            precool_validator_overrode     = pc_ovr,
+            precool_final_used             = pc_final,
         )
 
         # Write to memory buffer
@@ -531,6 +596,17 @@ class LoggerAgent:
                         "rejection_reasoning", "candidates",
                         "conf_historical", "conf_sensor", "conf_weather",
                         "conf_comfort", "conf_stability",
+                        "economizer_recommended", "economizer_mode",
+                        "temperature_advantage", "estimated_runtime_saved_hours",
+                        "estimated_energy_saved_kwh", "planner_accepted",
+                        "validator_overrode", "final_free_cooling_used",
+                        "economizer_confidence",
+                        "is_peak_window", "tariff_period", "tariff_inr_kwh",
+                        "dr_recommended", "dr_planner_accepted",
+                        "dr_validator_overrode", "dr_final_used", "dr_cost_saved_inr",
+                        "precool_recommended", "predicted_peak_outdoor_temp",
+                        "precool_planner_accepted", "precool_validator_overrode",
+                        "precool_final_used",
                     ])
                 w.writerow([
                     record.timestamp,
@@ -553,6 +629,28 @@ class LoggerAgent:
                     rejection_json,
                     candidates_json,
                     conf_s1, conf_s2, conf_s3, conf_s4, conf_s5,
+                    record.economizer_recommended,
+                    record.economizer_mode,
+                    f"{record.temperature_advantage:.2f}",
+                    f"{record.estimated_runtime_saved_hours:.2f}",
+                    f"{record.estimated_energy_saved_kwh:.3f}",
+                    record.planner_accepted,
+                    record.validator_overrode,
+                    record.final_free_cooling_used,
+                    f"{record.economizer_confidence:.2f}",
+                    record.is_peak_window,
+                    record.tariff_period,
+                    f"{record.tariff_inr_kwh:.2f}",
+                    record.dr_recommended,
+                    record.dr_planner_accepted,
+                    record.dr_validator_overrode,
+                    record.dr_final_used,
+                    f"{record.dr_cost_saved_inr:.2f}",
+                    record.precool_recommended,
+                    f"{record.predicted_peak_outdoor_temp:.2f}",
+                    record.precool_planner_accepted,
+                    record.precool_validator_overrode,
+                    record.precool_final_used,
                 ])
         except Exception:
             pass
@@ -594,12 +692,16 @@ class CoordinatorAgent:
         self.log_dir  = log_dir
 
         # Specialist agents (stateless — no shared mutable state between agents)
-        self._energy_agent   = EnergyOptimizerAgent()
-        self._comfort_agent  = ComfortOptimizerAgent()
-        self._validator      = ValidatorAgent()
-        self._planner        = PlannerAgent()
-        self._executor       = ActuatorExecutorAgent()
-        self._logger         = LoggerAgent()
+        self._energy_agent      = EnergyOptimizerAgent()
+        self._comfort_agent     = ComfortOptimizerAgent()
+        self._economizer        = EconomizerModule()
+        self._demand_response   = DemandResponseModule()
+        epw_p = os.path.join(log_dir, "..", "weather", "IND_KA_Bengaluru.432950_ISHRAE2014.epw")
+        self._predictive        = PredictivePrecoolModule(epw_p)
+        self._validator         = ValidatorAgent()
+        self._planner           = PlannerAgent()
+        self._executor          = ActuatorExecutorAgent()
+        self._logger            = LoggerAgent()
 
         # Resilience manager (health monitor, circuit breakers, sensor guard)
         self._resilience: "ResilienceManager | None" = None
@@ -668,6 +770,46 @@ class CoordinatorAgent:
         # ── Step 3: Comfort Optimizer ─────────────────────────────────────
         with self.tracer.stage("comfort_optimizer"):
             ctx.comfort_rec = self._comfort_agent.process(ctx)
+
+        # ── Step 3b: Economizer Advisory Agent ────────────────────────────
+        with self.tracer.stage("economizer_agent"):
+            ctx.economizer_rec = self._economizer.evaluate(obs)
+            if ctx.economizer_rec:
+                e_rec = ctx.economizer_rec
+                obs._economizer_note = (
+                    f"Recommended Mode   : {e_rec.recommended_mode}\n"
+                    f"Economizer Active  : {e_rec.economizer_active}\n"
+                    f"Temp Advantage     : +{e_rec.temperature_advantage:.2f}°C (Zone {obs.zone_temp:.2f}°C vs Outdoor {obs.outdoor_temp:.2f}°C)\n"
+                    f"Confidence         : {e_rec.confidence:.2f}\n"
+                    f"Est. Energy Saved  : {e_rec.estimated_energy_saved_kwh:.3f} kWh ({e_rec.estimated_runtime_saved_hours:.1f}h compressor runtime avoided)\n"
+                    f"Reason             : {e_rec.reason}"
+                )
+
+        # ── Step 3c: Demand Response / Peak Tariff Advisory Agent ──────────
+        with self.tracer.stage("demand_response_agent"):
+            ctx.dr_rec = self._demand_response.evaluate(obs)
+            if ctx.dr_rec:
+                dr_r = ctx.dr_rec
+                obs._dr_note = (
+                    f"Peak Tariff Window : {dr_r.is_peak_window}\n"
+                    f"Tariff Period      : {dr_r.current_tariff_period} (₹{dr_r.current_tariff_inr_kwh:.2f}/kWh)\n"
+                    f"Action Bias        : {dr_r.recommended_action_bias}\n"
+                    f"Est. Cost Saved    : ₹{dr_r.estimated_cost_saved_inr:.2f}\n"
+                    f"Reason             : {dr_r.reason}"
+                )
+
+        # ── Step 3d: Predictive Pre-Cooling Advisory Agent ───────────────
+        with self.tracer.stage("predictive_agent"):
+            ctx.precool_rec = self._predictive.evaluate(obs)
+            if ctx.precool_rec:
+                pc_r = ctx.precool_rec
+                obs._precool_note = (
+                    f"Precool Recommended: {pc_r.precool_recommended}\n"
+                    f"EPW 3h Peak Outdoor : {pc_r.predicted_peak_outdoor_temp:.1f}°C\n"
+                    f"Target Precool SP   : {pc_r.target_precool_sp:.1f}°C\n"
+                    f"Est Peak Reduc (W)  : {pc_r.estimated_peak_reduction_w:.1f} W\n"
+                    f"Reason              : {pc_r.reason}"
+                )
 
         # ── Step 4: Confidence Engine (pre-compute prior) ─────────────────
         with self.tracer.stage("confidence_engine"):

@@ -173,6 +173,18 @@ def compute_savings():
     comfort_deviation_ai = calc_comfort_deviation(ai_log_path)
     comfort_deviation_baseline = calc_comfort_deviation(baseline_log_path)
 
+    # Financial computations using BESCOM tariff rate from config.py
+    try:
+        from config import ELECTRICITY_TARIFF_INR_KWH
+    except ImportError:
+        ELECTRICITY_TARIFF_INR_KWH = 9.50
+
+    kwh_saved_abs = max(0.0, baseline_kwh - ai_kwh)
+    baseline_cost_inr = round(baseline_kwh * ELECTRICITY_TARIFF_INR_KWH, 2)
+    ai_cost_inr = round(ai_kwh * ELECTRICITY_TARIFF_INR_KWH, 2)
+    cost_saved_inr = round(kwh_saved_abs * ELECTRICITY_TARIFF_INR_KWH, 2)
+    annual_inr_est = round(cost_saved_inr * (365.0 / 7.0), 0)
+
     results = {
         "baseline_energy_kwh": round(baseline_kwh, 2),
         "ai_energy_kwh": round(ai_kwh, 2),
@@ -181,7 +193,12 @@ def compute_savings():
         "peak_demand_w_ai": round(ai_peak_w, 2),
         "pct_peak_demand_reduction": round(pct_peak_demand_reduction, 2),
         "comfort_deviation_ai": round(comfort_deviation_ai, 3),
-        "comfort_deviation_baseline": round(comfort_deviation_baseline, 3)
+        "comfort_deviation_baseline": round(comfort_deviation_baseline, 3),
+        "electricity_tariff_inr_kwh": ELECTRICITY_TARIFF_INR_KWH,
+        "baseline_cost_inr": baseline_cost_inr,
+        "ai_cost_inr": ai_cost_inr,
+        "cost_saved_inr": cost_saved_inr,
+        "annual_inr_est": annual_inr_est,
     }
 
     # Update summary JSON files with correct kWh values
@@ -226,8 +243,13 @@ def compute_savings():
     print(f"  EcoLoop AI Peak Demand        : {results['peak_demand_w_ai']:.2f} W ({ai_peak_time})")
     print(f"  Percentage Peak Demand Reduct.: {results['pct_peak_demand_reduction']:.2f} %")
     print("--------------------------------------------------")
-    print(f"  Comfort Deviation (Baseline)  : {results['comfort_deviation_baseline']:.3f} °C")
-    print(f"  Comfort Deviation (AI)        : {results['comfort_deviation_ai']:.3f} °C")
+    print(f"  Comfort Deviation (Baseline)  : {results['comfort_deviation_baseline']:.3f} deg C")
+    print(f"  Comfort Deviation (AI)        : {results['comfort_deviation_ai']:.3f} deg C")
+    print("--------------------------------------------------")
+    print(f"  BESCOM Commercial Tariff Rate : INR {ELECTRICITY_TARIFF_INR_KWH:.2f} / kWh")
+    print(f"  Baseline 7-Day Operating Cost : INR {baseline_cost_inr:,.2f}")
+    print(f"  EcoLoop AI 7-Day Operating Cost: INR {ai_cost_inr:,.2f}")
+    print(f"  Net 7-Day Financial Savings   : INR {cost_saved_inr:,.2f} (Annualized: INR {annual_inr_est:,.0f} / yr)")
     print("==================================================")
     print(f"Results saved to {results_json_path}\n")
 
