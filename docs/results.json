@@ -1,0 +1,10 @@
+{
+  "baseline_energy_kwh": 218.96,
+  "ai_energy_kwh": 210.56,
+  "pct_energy_savings": 3.84,
+  "peak_demand_w_baseline": 4114.33,
+  "peak_demand_w_ai": 4063.93,
+  "pct_peak_demand_reduction": 1.22,
+  "comfort_deviation_ai": 0.158,
+  "comfort_deviation_baseline": 0.291
+}

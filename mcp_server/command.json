@@ -1,0 +1,7 @@
+{
+  "status": "success",
+  "action": "eco",
+  "coil_speed": 1.0,
+  "rationale": "Cooling deviation is within acceptable range for eco mode",
+  "ok": true
+}

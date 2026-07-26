@@ -1,0 +1,232 @@
+{
+  "capacity": 12,
+  "records": [
+    {
+      "timestamp": "07/07 21:10",
+      "zone_temp": 26.06752582940093,
+      "heating_sp": 22.0,
+      "cooling_sp": 26.6,
+      "outdoor_temp": 22.616666666666667,
+      "action": "off",
+      "coil_speed": 0.0,
+      "reasoning": "Given the recent history of oscillation and low confidence levels, 'eco' is selected as it addresses the current comfort deviation with a gentle correction.",
+      "confidence": 0.075,
+      "energy_kwh": 0.0,
+      "comfort_deviation": 0.0,
+      "outcome": "CORRECTED",
+      "success": false,
+      "violations": [
+        "OSCILLATION",
+        "LOW_CONFIDENCE"
+      ]
+    },
+    {
+      "timestamp": "07/07 22:10",
+      "zone_temp": 26.940806095194986,
+      "heating_sp": 22.0,
+      "cooling_sp": 24.6,
+      "outdoor_temp": 21.599999999999998,
+      "action": "boost",
+      "coil_speed": 1.9,
+      "reasoning": "Given the recent history of oscillation and low confidence levels, 'eco' is selected as it addresses the current comfort deviation without causing further oscillations.",
+      "confidence": 0.154,
+      "energy_kwh": 0.6,
+      "comfort_deviation": 2.340806095194985,
+      "outcome": "CORRECTED",
+      "success": false,
+      "violations": [
+        "OSCILLATION",
+        "LOW_CONFIDENCE"
+      ]
+    },
+    {
+      "timestamp": "07/07 23:10",
+      "zone_temp": 26.30459011875689,
+      "heating_sp": 22.0,
+      "cooling_sp": 26.6,
+      "outdoor_temp": 21.1,
+      "action": "off",
+      "coil_speed": 0.0,
+      "reasoning": "Given the recent history of oscillation and low confidence levels, 'eco' is selected as it aligns with previous success and addresses the current comfort deviation without causing further oscillations.",
+      "confidence": 0.12,
+      "energy_kwh": 0.0,
+      "comfort_deviation": 0.0,
+      "outcome": "CORRECTED",
+      "success": false,
+      "violations": [
+        "OSCILLATION",
+        "LOW_CONFIDENCE"
+      ]
+    },
+    {
+      "timestamp": "07/01 00:10",
+      "zone_temp": 22.49931757286986,
+      "heating_sp": 22.0,
+      "cooling_sp": 26.6,
+      "outdoor_temp": 17.166666666666668,
+      "action": "off",
+      "coil_speed": 0.0,
+      "reasoning": "Given the recent history of oscillation and low confidence levels, 'eco' is selected as it aligns with previous success and addresses the current comfort deviation without causing further oscillations.",
+      "confidence": 0.247,
+      "energy_kwh": 0.0,
+      "comfort_deviation": 0.0,
+      "outcome": "CORRECTED",
+      "success": false,
+      "violations": [
+        "OSCILLATION",
+        "LOW_CONFIDENCE"
+      ]
+    },
+    {
+      "timestamp": "07/01 01:10",
+      "zone_temp": 22.05404277399424,
+      "heating_sp": 22.0,
+      "cooling_sp": 26.6,
+      "outdoor_temp": 16.950000000000003,
+      "action": "off",
+      "coil_speed": 0.0,
+      "reasoning": "Given the recent history of oscillation and low confidence levels, 'eco' is selected as it addresses the current comfort deviation with a gentle correction.",
+      "confidence": 0.262,
+      "energy_kwh": 0.0,
+      "comfort_deviation": 0.0,
+      "outcome": "CORRECTED",
+      "success": false,
+      "violations": [
+        "OSCILLATION",
+        "LOW_CONFIDENCE"
+      ]
+    },
+    {
+      "timestamp": "07/01 02:10",
+      "zone_temp": 21.609720279943453,
+      "heating_sp": 24.0,
+      "cooling_sp": 26.6,
+      "outdoor_temp": 16.65,
+      "action": "boost",
+      "coil_speed": 1.9,
+      "reasoning": "Given the recent history of oscillation and low confidence levels, 'eco' is selected as it addresses the current comfort deviation without risking further oscillations.",
+      "confidence": 0.318,
+      "energy_kwh": 0.6,
+      "comfort_deviation": 2.3902797200565473,
+      "outcome": "CORRECTED",
+      "success": false,
+      "violations": [
+        "OSCILLATION",
+        "LOW_CONFIDENCE"
+      ]
+    },
+    {
+      "timestamp": "07/01 03:10",
+      "zone_temp": 22.315716992823678,
+      "heating_sp": 22.0,
+      "cooling_sp": 26.6,
+      "outdoor_temp": 16.35,
+      "action": "off",
+      "coil_speed": 0.0,
+      "reasoning": "Given the recent history of oscillation and low confidence levels, 'eco' is selected as it addresses the current comfort deviation without exacerbating previous issues.",
+      "confidence": 0.268,
+      "energy_kwh": 0.0,
+      "comfort_deviation": 0.0,
+      "outcome": "CORRECTED",
+      "success": false,
+      "violations": [
+        "OSCILLATION",
+        "LOW_CONFIDENCE"
+      ]
+    },
+    {
+      "timestamp": "07/01 04:10",
+      "zone_temp": 20.99419859268719,
+      "heating_sp": 24.0,
+      "cooling_sp": 26.6,
+      "outdoor_temp": 16.1,
+      "action": "boost",
+      "coil_speed": 1.9,
+      "reasoning": "Given the recent history of oscillation and low confidence levels, 'eco' is selected as it addresses the current comfort deviation without allowing further oscillation.",
+      "confidence": 0.325,
+      "energy_kwh": 0.6,
+      "comfort_deviation": 3.005801407312809,
+      "outcome": "CORRECTED",
+      "success": false,
+      "violations": [
+        "OSCILLATION",
+        "LOW_CONFIDENCE"
+      ]
+    },
+    {
+      "timestamp": "07/01 05:10",
+      "zone_temp": 24.37080163536518,
+      "heating_sp": 22.0,
+      "cooling_sp": 26.6,
+      "outdoor_temp": 16.1,
+      "action": "off",
+      "coil_speed": 0.0,
+      "reasoning": "Given the recent history of oscillation and low confidence levels, 'eco' is selected as it aligns with previous success and addresses the current comfort deviation without causing further oscillations.",
+      "confidence": 0.298,
+      "energy_kwh": 0.0,
+      "comfort_deviation": 0.0,
+      "outcome": "CORRECTED",
+      "success": false,
+      "violations": [
+        "OSCILLATION",
+        "LOW_CONFIDENCE"
+      ]
+    },
+    {
+      "timestamp": "07/01 06:10",
+      "zone_temp": 21.114735433180094,
+      "heating_sp": 24.0,
+      "cooling_sp": 26.6,
+      "outdoor_temp": 16.1,
+      "action": "boost",
+      "coil_speed": 1.9,
+      "reasoning": "Given the recent history of oscillation and low confidence levels, 'eco' is selected as it addresses the current comfort deviation with a gentle correction while avoiding further oscillations.",
+      "confidence": 0.404,
+      "energy_kwh": 0.6,
+      "comfort_deviation": 2.885264566819906,
+      "outcome": "CORRECTED",
+      "success": false,
+      "violations": [
+        "OSCILLATION"
+      ]
+    },
+    {
+      "timestamp": "07/01 07:10",
+      "zone_temp": 24.50904238194567,
+      "heating_sp": 22.0,
+      "cooling_sp": 26.6,
+      "outdoor_temp": 16.200000000000003,
+      "action": "off",
+      "coil_speed": 0.0,
+      "reasoning": "Given the recent history of oscillation and low confidence levels, 'eco' is selected as it addresses the current comfort issue within a single cycle without risking oscillation or over-correction.",
+      "confidence": 0.312,
+      "energy_kwh": 0.0,
+      "comfort_deviation": 0.0,
+      "outcome": "CORRECTED",
+      "success": false,
+      "violations": [
+        "OSCILLATION",
+        "LOW_CONFIDENCE"
+      ]
+    },
+    {
+      "timestamp": "07/01 08:10",
+      "zone_temp": 22.606875066894336,
+      "heating_sp": 22.0,
+      "cooling_sp": 26.6,
+      "outdoor_temp": 16.78333333333333,
+      "action": "off",
+      "coil_speed": 0.0,
+      "reasoning": "Given the recent history of oscillation and low confidence levels, 'eco' is selected as it addresses the current comfort deviation without causing further oscillations.",
+      "confidence": 0.297,
+      "energy_kwh": 0.0,
+      "comfort_deviation": 0.0,
+      "outcome": "CORRECTED",
+      "success": false,
+      "violations": [
+        "OSCILLATION",
+        "LOW_CONFIDENCE"
+      ]
+    }
+  ]
+}

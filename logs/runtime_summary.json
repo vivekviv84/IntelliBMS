@@ -1,0 +1,14 @@
+{
+  "total_cycles": 9,
+  "average_latency_ms": 16792.88,
+  "average_llm_latency_ms": 8390.48,
+  "min_cycle_latency_ms": 14797.19,
+  "max_cycle_latency_ms": 28878.97,
+  "average_confidence": 0.303,
+  "fallback_count": 0,
+  "circuit_breaker_trips": 0,
+  "success_rate_pct": 100.0,
+  "energy_savings_pct": 6.25,
+  "total_runtime_s": 75.72,
+  "last_updated_ts": "2026-07-26 04:26:52"
+}

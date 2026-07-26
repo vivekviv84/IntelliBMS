@@ -1,0 +1,95 @@
+{
+  "overall_status": "healthy",
+  "session_start": "2026-07-25T22:55:36Z",
+  "last_updated": "2026-07-25T22:56:52Z",
+  "frozen": false,
+  "components": {
+    "llm_agent": {
+      "name": "llm_agent",
+      "status": "healthy",
+      "last_success_ts": "2026-07-25T22:56:52Z",
+      "last_failure_ts": "",
+      "failure_count": 0,
+      "last_error": "",
+      "note": "Decision produced"
+    },
+    "ollama_service": {
+      "name": "ollama_service",
+      "status": "healthy",
+      "last_success_ts": "2026-07-25T22:56:52Z",
+      "last_failure_ts": "",
+      "failure_count": 0,
+      "last_error": "",
+      "note": "LLM call succeeded"
+    },
+    "energyplus_plugin": {
+      "name": "energyplus_plugin",
+      "status": "unknown",
+      "last_success_ts": "",
+      "last_failure_ts": "",
+      "failure_count": 0,
+      "last_error": "",
+      "note": "Initialising"
+    },
+    "mcp_bridge": {
+      "name": "mcp_bridge",
+      "status": "unknown",
+      "last_success_ts": "",
+      "last_failure_ts": "",
+      "failure_count": 0,
+      "last_error": "",
+      "note": "Initialising"
+    },
+    "memory_io": {
+      "name": "memory_io",
+      "status": "unknown",
+      "last_success_ts": "",
+      "last_failure_ts": "",
+      "failure_count": 0,
+      "last_error": "",
+      "note": "Initialising"
+    },
+    "actuator": {
+      "name": "actuator",
+      "status": "healthy",
+      "last_success_ts": "2026-07-25T22:56:52Z",
+      "last_failure_ts": "",
+      "failure_count": 0,
+      "last_error": "",
+      "note": "coil_speed=0.00"
+    },
+    "sensor_zone_temp": {
+      "name": "sensor_zone_temp",
+      "status": "unknown",
+      "last_success_ts": "",
+      "last_failure_ts": "",
+      "failure_count": 0,
+      "last_error": "",
+      "note": "Initialising"
+    },
+    "sensor_outdoor_temp": {
+      "name": "sensor_outdoor_temp",
+      "status": "unknown",
+      "last_success_ts": "",
+      "last_failure_ts": "",
+      "failure_count": 0,
+      "last_error": "",
+      "note": "Initialising"
+    },
+    "explanation_engine": {
+      "name": "explanation_engine",
+      "status": "healthy",
+      "last_success_ts": "2026-07-25T22:56:52Z",
+      "last_failure_ts": "",
+      "failure_count": 0,
+      "last_error": "",
+      "note": "Explanation written"
+    }
+  },
+  "counts": {
+    "healthy": 4,
+    "degraded": 0,
+    "failed": 0,
+    "unknown": 5
+  }
+}
