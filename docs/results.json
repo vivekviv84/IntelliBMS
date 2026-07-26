@@ -1,15 +1,15 @@
 {
   "baseline_energy_kwh": 230.56,
-  "ai_energy_kwh": 218.37,
-  "pct_energy_savings": 5.29,
+  "ai_energy_kwh": 218.38,
+  "pct_energy_savings": 5.28,
   "peak_demand_w_baseline": 4239.78,
-  "peak_demand_w_ai": 3952.23,
+  "peak_demand_w_ai": 3952.39,
   "pct_peak_demand_reduction": 6.78,
-  "comfort_deviation_ai": 0.194,
+  "comfort_deviation_ai": 0.189,
   "comfort_deviation_baseline": 0.471,
   "electricity_tariff_inr_kwh": 9.5,
   "baseline_cost_inr": 2190.29,
-  "ai_cost_inr": 2074.48,
-  "cost_saved_inr": 115.81,
-  "annual_inr_est": 6039.0
+  "ai_cost_inr": 2074.65,
+  "cost_saved_inr": 115.64,
+  "annual_inr_est": 6030.0
 }

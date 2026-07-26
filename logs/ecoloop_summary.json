@@ -1,9 +1,9 @@
 {
   "simulation": "ecoloop_ai",
-  "total_facility_electricity_kwh": 218.37,
+  "total_facility_electricity_kwh": 218.38,
   "idf_path": "C:\\Users\\ACER\\Desktop\\honeywell\\Eco loop\\ecoloop\\models\\ecoloop_model.idf",
   "epw_path": "C:\\Users\\ACER\\Desktop\\honeywell\\Eco loop\\ecoloop\\weather\\IND_KA_Bengaluru.432950_ISHRAE2014.epw",
   "return_code": 0,
-  "peak_demand_w": 3952.23,
+  "peak_demand_w": 3952.39,
   "peak_demand_timestamp": "07-JUL-15:00"
 }

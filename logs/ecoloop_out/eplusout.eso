@@ -1,4 +1,4 @@
-Program Version,EnergyPlus, Version 26.1.0-6f2e40d102, YMD=2026.07.26 22:57
+Program Version,EnergyPlus, Version 26.1.0-6f2e40d102, YMD=2026.07.27 01:23
 1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]
 2,8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType
 3,5,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Report Variables Requested
@@ -90,7 +90,7 @@ End of Data Dictionary
 2,2, 7, 2, 0, 6, 0.00,60.00,Wednesday
 863,1.0
 2,2, 7, 2, 0, 7, 0.00,60.00,Wednesday
-863,0.0
+863,1.0000000000000002
 2,2, 7, 2, 0, 8, 0.00,60.00,Wednesday
 863,1.0
 2,2, 7, 2, 0, 9, 0.00,60.00,Wednesday
@@ -234,7 +234,7 @@ End of Data Dictionary
 2,5, 7, 5, 0, 6, 0.00,60.00,Saturday
 863,1.0
 2,5, 7, 5, 0, 7, 0.00,60.00,Saturday
-863,0.0
+863,1.0000000000000002
 2,5, 7, 5, 0, 8, 0.00,60.00,Saturday
 863,1.0
 2,5, 7, 5, 0, 9, 0.00,60.00,Saturday
@@ -330,7 +330,7 @@ End of Data Dictionary
 2,7, 7, 7, 0, 6, 0.00,60.00,Monday
 863,1.0
 2,7, 7, 7, 0, 7, 0.00,60.00,Monday
-863,0.0
+863,1.0
 2,7, 7, 7, 0, 8, 0.00,60.00,Monday
 863,0.9999999999999994
 2,7, 7, 7, 0, 9, 0.00,60.00,Monday
