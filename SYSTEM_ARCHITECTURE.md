@@ -1,7 +1,7 @@
-# SYSTEM_ARCHITECTURE.md — EcoLoop Multi-Agent HVAC Control Architecture
+# SYSTEM_ARCHITECTURE.md :-EcoLoop Multi-Agent HVAC Control Architecture
 
 **Author**: Senior Software Architect, BMS & Autonomous Systems  
-**Project**: EcoLoop (IntelliBMS Cyber-Physical Energy Optimization System)  
+**Project**: EcoLoop (IntelliBMS Cyber-Physical Energy Optimisation System)  
 **Target Environment**: Commercial Building Automation Systems (BAS), EnergyPlus 26.1.0, Local Ollama (`qwen2.5:3b`)
 
 ---
@@ -15,6 +15,7 @@ Commercial HVAC systems account for over 40% of total electrical energy consumpt
 EcoLoop addresses these limitations by introducing a closed-loop, multi-agent cyber-physical control architecture integrated directly into EnergyPlus co-simulations via Python Plugins. The system orchestrates stateless Specialist Advisory Agents, a mathematical Confidence Engine, an LLM-based Planning Agent, and a deterministic Safety Validator. The objective is to minimize facility electrical consumption and peak demand loads while maintaining occupant thermal comfort within strict safety envelopes.
 
 ---
+<img width="1184" height="628" alt="image" src="https://github.com/user-attachments/assets/24a41745-b506-4ad2-b8e5-5f4bf7ebd9eb" />
 
 ## 2. System Architecture
 
@@ -24,32 +25,52 @@ EcoLoop follows a modular, 7-agent hierarchical pipeline executed synchronously 
 
 ```mermaid
 graph TD
-    EP[EnergyPlus Engine 26.1.0] -->|Sensor Handles| SP[CoilSpeedControl PythonPlugin]
-    SP -->|ObservationContext| CA[CoordinatorAgent Orchestrator]
-    
-    subgraph Specialist Advisory Layer
-        CA --> EO[EnergyOptimizerAgent]
-        CA --> CO[ComfortOptimizerAgent]
-        CA --> CE[ConfidenceEngine]
-        CA --> EA[Economizer Advisory Agent]
-        CA --> DR[Demand Response Advisory Agent]
-        CA --> PC[Predictive Pre-Cooling Agent]
-    Merging
-    
-    EO -->|Energy Rec| PA[PlanningAgent LLM]
-    CO -->|Comfort Rec| PA
-    CE -->|Confidence Prior| PA
-    EA -->|Free Cooling Note| PA
-    DR -->|ToU Tariff Note| PA
-    PC -->|EPW Forecast Note| PA
-    
-    PA -->|PlannerDecision| VA[ValidatorAgent Safety Guard]
-    VA -->|Approved / Overridden Action| AE[ActuatorExecutorAgent]
-    AE -->|Clamped Coil Speed| EP
-    
-    AE -->|ExecutionResult| LA[LoggerAgent & Memory]
-    LA -->|MemoryRecord| STM[ShortTermMemory Ring Buffer]
-    LA -->|CSV Stream| DB[Streamlit Visual Dashboard]
+
+EP[EnergyPlus Engine 26.1.0] --> SP[Sensor Handles]
+SP --> OC[Observation Context]
+OC --> CA[Coordinator Agent]
+
+subgraph Specialist_Advisory_Layer
+
+CA --> EO[Energy Optimizer]
+
+CA --> CO[Comfort Optimizer]
+
+CA --> CE[Confidence Engine]
+
+CA --> EA[Economizer Advisory]
+
+CA --> DR[Demand Response Advisory]
+
+CA --> PC[Predictive Pre-Cooling Advisory]
+
+end
+
+EO -->|Energy Recommendation| PA[Planning Agent LLM]
+
+CO -->|Comfort Recommendation| PA
+
+CE -->|Confidence Prior| PA
+
+EA -->|Economizer Advisory| PA
+
+DR -->|Demand Response Advisory| PA
+
+PC -->|Predictive Advisory| PA
+
+PA --> VA[Validator Agent]
+
+VA --> AE[Actuator Executor]
+
+AE --> EP
+
+AE --> LA[Logger]
+
+LA --> STM[Short-Term Memory]
+
+LA --> CSV[Decision Log CSV]
+
+CSV --> DB[Streamlit Dashboard]
 ```
 
 ### Component Responsibilities
