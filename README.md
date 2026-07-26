@@ -5,6 +5,8 @@
 **Target Environment**: Commercial Building Automation Systems (BAS), EnergyPlus 26.1.0, Local Ollama (`qwen2.5:3b`)
 
 ---
+## PROJECT VIDEO 
+https://drive.google.com/file/d/1QLJo4P77yXRjdJ1aMe8IjabnuUexWP74/view?usp=sharing
 
 ## 1. Project Overview
 
