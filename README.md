@@ -15,6 +15,7 @@ Commercial HVAC systems account for over 40% of total electrical energy consumpt
 EcoLoop addresses these limitations by introducing a closed-loop, multi-agent cyber-physical control architecture integrated directly into EnergyPlus co-simulations via Python Plugins. The system orchestrates stateless Specialist Advisory Agents, a mathematical Confidence Engine, an LLM-based Planning Agent, and a deterministic Safety Validator. The objective is to minimize facility electrical consumption and peak demand loads while maintaining occupant thermal comfort within strict safety envelopes.
 
 ---
+<img width="1184" height="628" alt="image" src="https://github.com/user-attachments/assets/24a41745-b506-4ad2-b8e5-5f4bf7ebd9eb" />
 
 ## 2. System Architecture
 
