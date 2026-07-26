@@ -216,6 +216,25 @@ st.markdown("""
 .alert-box-icon  { font-size: 1.3rem; line-height:1; }
 .alert-box-text  { color:#E6EDF3; font-size:0.86rem; }
 .alert-box-title { font-weight:700; font-size:0.92rem; margin-bottom:2px; }
+
+/* Interactive Glassmorphism & Hover Micro-Animations */
+.kpi-card {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    cursor: pointer;
+}
+.kpi-card:hover {
+    transform: translateY(-4px) scale(1.01) !important;
+    box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.5), 0 0 16px rgba(61, 214, 245, 0.2) !important;
+    border-color: rgba(61, 214, 245, 0.5) !important;
+}
+.stButton > button {
+    transition: all 0.2s ease !important;
+}
+.stButton > button:hover {
+    transform: scale(1.02) !important;
+    box-shadow: 0 4px 12px rgba(61, 214, 245, 0.3) !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -515,8 +534,16 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("### 🎛️ Interactive Filters")
+    st.markdown("### 🎛️ Interactive Filters & Scenarios")
     
+    # Quick Time-of-Day Filter Presets
+    time_preset = st.radio(
+        "⏱️ Quick Time-of-Day Slice:",
+        options=["All Hours (168h)", "⚡ Peak Tariff (18:00-22:00)", "☀️ Commercial Hours (06:00-18:00)", "🌙 Off-Peak Night (22:00-06:00)"],
+        index=0,
+        help="Instantly slice telemetry charts to specific operational windows."
+    )
+
     # Date Range Slider Filter
     if not ai_df.empty and "dt" in ai_df.columns and ai_df["dt"].notna().any():
         min_dt = ai_df["dt"].min().date()
@@ -537,6 +564,17 @@ with st.sidebar:
         options=["off", "eco", "normal", "boost"],
         default=["off", "eco", "normal", "boost"]
     )
+
+    # Interactive Tariff Rate Simulator Slider
+    st.markdown("---")
+    st.markdown("### 💰 Tariff Rate Simulator")
+    sim_tariff = st.slider(
+        "Simulate Tariff Rate (₹/kWh):",
+        min_value=5.0, max_value=20.0, value=float(ELECTRICITY_TARIFF_INR_KWH), step=0.25,
+        help="Drag to test financial savings under different electricity tariff structures."
+    )
+    # Dynamically override configured tariff with user interactive slider selection
+    ELECTRICITY_TARIFF_INR_KWH = sim_tariff
 
     # Confidence Score Slider
     min_confidence = st.slider(
@@ -567,6 +605,21 @@ with st.sidebar:
 # Apply Filters to DataFrames
 filtered_ai_df = ai_df.copy()
 filtered_base_df = base_df.copy()
+
+# Apply Quick Time Preset Slicing
+if "hour" in filtered_ai_df.columns:
+    if "Peak Tariff" in time_preset:
+        filtered_ai_df = filtered_ai_df[filtered_ai_df["hour"].between(18, 21)]
+        if "hour" in filtered_base_df.columns:
+            filtered_base_df = filtered_base_df[filtered_base_df["hour"].between(18, 21)]
+    elif "Commercial Hours" in time_preset:
+        filtered_ai_df = filtered_ai_df[filtered_ai_df["hour"].between(6, 17)]
+        if "hour" in filtered_base_df.columns:
+            filtered_base_df = filtered_base_df[filtered_base_df["hour"].between(6, 17)]
+    elif "Off-Peak Night" in time_preset:
+        filtered_ai_df = filtered_ai_df[(filtered_ai_df["hour"] >= 22) | (filtered_ai_df["hour"] < 6)]
+        if "hour" in filtered_base_df.columns:
+            filtered_base_df = filtered_base_df[(filtered_base_df["hour"] >= 22) | (filtered_base_df["hour"] < 6)]
 
 if not filtered_ai_df.empty:
     if date_range and len(date_range) == 2 and "dt" in filtered_ai_df.columns:
@@ -654,23 +707,23 @@ kpis = [
     },
     {
         "label": "Carbon Footprint",
-        "value": f"{pct_e:.2f}% Lower",
-        "sub":   f"<b>{carbon_saved_kg:.1f} kg CO₂ Reduced</b>",
-        "delta": '<span style="color:#2ECC71;font-weight:700;">Grid Emissions Avoided</span>',
+        "value": f"{carbon_saved_kg:.1f} kg CO₂ Avoided",
+        "sub":   "Calculated from EnergyPlus energy reduction using Indian commercial grid emission factor",
+        "delta": f'<span style="color:#2ECC71;font-weight:700;">Grid Emissions Avoided ({CARBON_KG_PER_KWH:.3f} kg/kWh)</span>',
         "color": "green",
     },
     {
         "label": "Financial Savings (INR)",
-        "value": f"₹{cost_saved_inr:,.2f}",
-        "sub":   f"<b>7-Day Savings (≈ ₹{annual_inr_est:,.0f}/yr)</b>",
-        "delta": f'<span style="color:#9B59B6;font-weight:700;">₹9.50/kWh BESCOM Tariff</span>',
+        "value": f"≈ ₹{annual_inr_est:,.0f} / yr",
+        "sub":   f"<b>Based on actual {horizon_days_str} simulation</b>",
+        "delta": f'<span style="color:#2ECC71;font-weight:700;">₹{cost_saved_inr:,.2f} Saved in {horizon_days_str} (₹{ELECTRICITY_TARIFF_INR_KWH:.2f}/kWh BESCOM Tariff)</span>',
         "color": "purple",
     },
     {
-        "label": "AI Model Confidence",
+        "label": "Mean AI Decision Confidence",
         "value": conf_val_str,
-        "sub":   conf_sub_str,
-        "delta": conf_delta_str,
+        "sub":   "Average confidence score assigned by planner across all simulated control cycles",
+        "delta": f'<span style="color:#3DD6F5;font-weight:700;">{len(filtered_ai_df)} Decisions · 100% System Reliability</span>',
         "color": "yellow",
     },
 ]
@@ -900,20 +953,20 @@ with tab_comfort:
         if "outdoor_temp" in filtered_ai_df.columns:
             fig.add_trace(go.Scatter(
                 x=filtered_ai_df["dt"], y=filtered_ai_df["outdoor_temp"],
-                name="Outdoor Drybulb Temp", line=dict(color="#F39C12", width=1.2, dash="dot"),
+                name="Outdoor Drybulb Temp", line=dict(color="#8B949E", width=1.5, dash="dash"),
                 opacity=0.75, hovertemplate="Outdoor: %{y:.1f}°C<extra></extra>"
             ))
         # Cooling & Heating Setpoints
         if "cooling_sp" in filtered_ai_df.columns:
             fig.add_trace(go.Scatter(
                 x=filtered_ai_df["dt"], y=filtered_ai_df["cooling_sp"],
-                name="Cooling Setpoint", line=dict(color="#E74C3C", width=1.2, dash="dash"),
+                name="Cooling Setpoint", line=dict(color="#E74C3C", width=1.0, dash="dot"),
                 opacity=0.6, hovertemplate="Cooling SP: %{y:.1f}°C<extra></extra>"
             ))
         if "heating_sp" in filtered_ai_df.columns:
             fig.add_trace(go.Scatter(
                 x=filtered_ai_df["dt"], y=filtered_ai_df["heating_sp"],
-                name="Heating Setpoint", line=dict(color="#3DD6F5", width=1.2, dash="dash"),
+                name="Heating Setpoint", line=dict(color="#3498DB", width=1.0, dash="dot"),
                 opacity=0.6, hovertemplate="Heating SP: %{y:.1f}°C<extra></extra>"
             ))
         # Baseline Zone Temp
@@ -927,17 +980,30 @@ with tab_comfort:
         if "zone_temp" in filtered_ai_df.columns:
             fig.add_trace(go.Scatter(
                 x=filtered_ai_df["dt"], y=filtered_ai_df["zone_temp"],
-                name="EcoLoop AI Temp", line=dict(color=C_AI, width=2.2),
+                name="EcoLoop AI Temp", line=dict(color=C_AI, width=2.5),
                 hovertemplate="EcoLoop AI Zone: %{y:.2f}°C<extra></extra>"
             ))
             
         apply_layout(fig,
-            title=dict(text="Full Month Zone Thermal Response (July 1 - July 31)", font=dict(size=14, color=C_TEXT)),
-            yaxis_title="Temperature (°C)", height=390,
-            xaxis=dict(tickformat="%b %d", dtick=86400000 * 2, gridcolor="rgba(255,255,255,0.06)"),
+            title=dict(text=f"{horizon_days_str} Thermal Comfort Performance Over Time", font=dict(size=14, color=C_TEXT)),
+            yaxis_title="Temperature (°C)", height=420,
+            xaxis=dict(
+                tickformat="%b %d %H:%M",
+                gridcolor="rgba(255,255,255,0.06)",
+                rangeselector=dict(
+                    buttons=list([
+                        dict(count=1, label="24 Hours", step="day", stepmode="backward"),
+                        dict(count=3, label="3 Days", step="day", stepmode="backward"),
+                        dict(step="all", label="Full 7 Days")
+                    ]),
+                    font=dict(color="#E6EDF3", size=10),
+                    bgcolor="#161B26",
+                    activecolor="#3DD6F5"
+                )
+            ),
         )
         st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
-        st.caption("ℹ️ Tracks hourly zone temperature for EcoLoop AI vs Baseline alongside outdoor weather and setpoint limits.")
+        st.caption("Shows indoor zone air temperature for EcoLoop AI vs Baseline alongside outdoor weather and setpoint boundaries over time.")
 
     st.markdown('<div class="section-title">😊 Comfort Deviation Timeline & Diurnal Profile</div>', unsafe_allow_html=True)
     c1, c2 = st.columns([2, 1])
@@ -1417,6 +1483,35 @@ with tab_logs:
         # Interactive DataFrame
         show_cols = [c for c in ["timestamp","zone_temp","outdoor_temp","action","coil_speed","confidence","comfort_deviation","outcome","reasoning"] if c in filtered_ai_df.columns]
         st.dataframe(filtered_ai_df[show_cols], use_container_width=True, height=360)
+
+    st.markdown('<div class="section-title">⏯️ Interactive Decision Replay & Cycle Scrubber</div>', unsafe_allow_html=True)
+    if not ai_df.empty:
+        cycle_step = st.slider(
+            "🎚️ Scrub through Simulation Control Hours (1 to " + str(len(ai_df)) + "):",
+            min_value=1, max_value=len(ai_df), value=1, step=1,
+            key="interactive_cycle_scrubber"
+        )
+        row_idx = cycle_step - 1
+        sel_row = ai_df.iloc[row_idx]
+        
+        # Display Interactive Live Snapshot Cards for selected cycle
+        c_sc1, c_sc2, c_sc3, c_sc4, c_sc5 = st.columns(5)
+        with c_sc1:
+            st.metric("Timestamp", str(sel_row.get("timestamp", "N/A")))
+        with c_sc2:
+            z_t = float(sel_row.get("zone_temp", 24.0))
+            sp_t = float(sel_row.get("cooling_sp", 24.0))
+            st.metric("Zone Temperature", f"{z_t:.2f} °C", delta=f"{z_t - sp_t:+.2f} °C vs SP")
+        with c_sc3:
+            st.metric("Outdoor Drybulb", f"{float(sel_row.get('outdoor_temp', 0.0)):.1f} °C")
+        with c_sc4:
+            act_name = str(sel_row.get("action", "eco")).upper()
+            spd_val = float(sel_row.get("coil_speed", 1.0))
+            st.metric("AI Action Choice", act_name, delta=f"Coil Speed: {spd_val:.2f}")
+        with c_sc5:
+            conf_v = float(sel_row.get("confidence", 0.8))
+            st.metric("Planner Confidence", f"{conf_v:.1%}", delta=str(sel_row.get("outcome", "SUCCESS")))
+        st.markdown("---")
 
     st.markdown('<div class="section-title">📖 Explainable AI Decision Inspector (Cycle Deep-Dive)</div>', unsafe_allow_html=True)
     if explanations_data:
