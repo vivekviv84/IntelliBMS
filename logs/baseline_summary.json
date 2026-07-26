@@ -1,9 +1,9 @@
 {
   "simulation": "baseline",
-  "total_facility_electricity_kwh": 218.96,
+  "total_facility_electricity_kwh": 1073.33,
   "idf_path": "C:\\Users\\ACER\\Desktop\\honeywell\\Eco loop\\ecoloop\\models\\baseline.idf",
   "epw_path": "C:\\Users\\ACER\\Desktop\\honeywell\\Eco loop\\ecoloop\\weather\\USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw",
   "return_code": 0,
-  "peak_demand_w": 4114.33,
-  "peak_demand_timestamp": "04-JUL-16:00"
+  "peak_demand_w": 4488.39,
+  "peak_demand_timestamp": "15-JUL-16:00"
 }
