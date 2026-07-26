@@ -1,7 +1,7 @@
-# SYSTEM_ARCHITECTURE.md — EcoLoop Multi-Agent HVAC Control Architecture
+# EcoLoop Multi-Agent HVAC Control Architecture
 
 **Author**: Senior Software Architect, BMS & Autonomous Systems  
-**Project**: EcoLoop (IntelliBMS Cyber-Physical Energy Optimization System)  
+**Project**: EcoLoop (IntelliBMS Cyber-Physical Energy Optimisation System)  
 **Target Environment**: Commercial Building Automation Systems (BAS), EnergyPlus 26.1.0, Local Ollama (`qwen2.5:3b`)
 
 ---
