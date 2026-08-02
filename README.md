@@ -1,4 +1,4 @@
-# EcoLoop Multi-Agent HVAC Control Architecture
+# EcoLoop Multi-Agent HVAC Control Architecture (IntelliBMS)
 
 **Author**: Senior Software Architect, BMS & Autonomous Systems  
 **Project**: EcoLoop (IntelliBMS Cyber-Physical Energy Optimisation System)  
